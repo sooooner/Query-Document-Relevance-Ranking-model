@@ -146,23 +146,23 @@ def random_deletion(words, p):
 # Randomly swap two words in the sentence n times
 ########################################################################
 
-# def random_swap(words, n):
-# 	new_words = words.copy()
-# 	for _ in range(n):
-# 		new_words = swap_word(new_words)
-# 	return new_words
-# 
-# def swap_word(new_words):
-# 	random_idx_1 = random.randint(0, len(new_words)-1)
-# 	random_idx_2 = random_idx_1
-# 	counter = 0
-# 	while random_idx_2 == random_idx_1:
-# 		random_idx_2 = random.randint(0, len(new_words)-1)
-# 		counter += 1
-# 		if counter > 3:
-# 			return new_words
-# 	new_words[random_idx_1], new_words[random_idx_2] = new_words[random_idx_2], new_words[random_idx_1] 
-# 	return new_words
+def random_swap(words, n):
+	new_words = words.copy()
+	for _ in range(n):
+		new_words = swap_word(new_words)
+	return new_words
+
+def swap_word(new_words):
+	random_idx_1 = random.randint(0, len(new_words)-1)
+	random_idx_2 = random_idx_1
+	counter = 0
+	while random_idx_2 == random_idx_1:
+		random_idx_2 = random.randint(0, len(new_words)-1)
+		counter += 1
+		if counter > 3:
+			return new_words
+	new_words[random_idx_1], new_words[random_idx_2] = new_words[random_idx_2], new_words[random_idx_1] 
+	return new_words
 
 ########################################################################
 # Random insertion
@@ -200,10 +200,10 @@ def eda(sentence, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=9)
 	num_words = len(words)
 	
 	augmented_sentences = []
-	num_new_per_technique = int((num_aug-1)/3)+1
+	num_new_per_technique = int(num_aug/4)+1
 	n_sr = max(1, int(alpha_sr*num_words))
 	n_ri = max(1, int(alpha_ri*num_words))
-	# n_rs = max(1, int(alpha_rs*num_words))
+	n_rs = max(1, int(alpha_rs*num_words))
 
 	#sr
 	for _ in range(num_new_per_technique):
@@ -216,10 +216,9 @@ def eda(sentence, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=9)
 		augmented_sentences.append(' '.join(a_words))
 
 	# #rs
-	# TF-IDF를 사용하기에 의미 없음
-	# for _ in range(num_new_per_technique):
-	# 	a_words = random_swap(words, n_rs)
-	# 	augmented_sentences.append(' '.join(a_words))
+	for _ in range(num_new_per_technique):
+		a_words = random_swap(words, n_rs)
+		augmented_sentences.append(' '.join(a_words))
 
 	#rd
 	for _ in range(num_new_per_technique):
