@@ -2,7 +2,7 @@
 import tensorflow as tf
 
 class Dense(tf.keras.layers.Layer):
-    def __init__(self, units, input_dims=5, **kwargs):
+    def __init__(self, units, input_dims=30, **kwargs):
         super(Dense, self).__init__(name='Linear', **kwargs)
         self._supports_ragged_inputs = True
         self.units = units
@@ -28,8 +28,8 @@ class Word_Matching_Network(tf.keras.Model):
         super(Word_Matching_Network, self).__init__(name='Word_Matching_Network')
         self._supports_ragged_inputs = True        
         self.Layer1 = Dense(5, input_dims=30)
-        self.Layer2 = Dense(5)
-        self.Layer3 = Dense(1)
+        self.Layer2 = Dense(5, input_dims=5)
+        self.Layer3 = Dense(1, input_dims=5)
 
     def call(self, inputs):
         x = self.Layer1(inputs)
@@ -63,7 +63,8 @@ class Gating_Network(tf.keras.layers.Layer):
         
     def call(self, idf):
         g = tf.math.multiply(idf, self.w)
-        softmax = self.ragged_softmax(g)
+        softmax = tf.ragged.map_flat_values(tf.nn.softmax, g)
+        # softmax = self.ragged_softmax(g)
         return softmax
         
 class Score_Aggregation(tf.keras.layers.Layer):
@@ -88,7 +89,10 @@ class Conv_stack(tf.keras.layers.Layer):
             self.conv_dict[i] = tf.keras.layers.Conv2D(self.nf, i, strides=(1, 1), padding='same')
 
     def call(self, inputs):
-        inputs = tf.expand_dims(inputs, axis=-1)
+        if len(inputs.shape) == 3:
+            inputs = tf.expand_dims(inputs, axis=-1)
+        else:
+            inputs = tf.transpose(inputs, [0, 2, 3, 1])
         x_1 = inputs
         x = {}
         for i in range(2, self.lg+1):
@@ -102,25 +106,24 @@ class Dim_wise_max_pooling(tf.keras.layers.Layer):
         self.nf = nf
         
     def call(self, inputs):
-        channel_range = [self.nf*i+1 for i in range(self.lg)]
-        x_1 = inputs[:, :, :, 0]
+        inputs_channel_num = inputs.shape[-1] + (1 - self.lg)*self.nf
+        channel_range = [0] + [self.nf*i+inputs_channel_num for i in range(self.lg)]
         x = {}
-        for i in range(2, self.lg+1):
-            x[i] = tf.reduce_max(inputs[:, :, :, channel_range[i-2]:channel_range[i-1]], axis=-1)
+        for i in range(1, self.lg+1):
+            x[i] = tf.math.reduce_max(inputs[:, :, :, channel_range[i-1]:channel_range[i]], axis=-1, keepdims=True)
             
-        return tf.keras.layers.concatenate([x_1] + [x[k] for k in x])
+        return tf.keras.layers.concatenate([x[k] for k in x])
         
 class Row_wise_max_pooling(tf.keras.layers.Layer):
-    def __init__(self, ns, lg, firstk):
+    def __init__(self, ns, lg):
         super(Row_wise_max_pooling, self).__init__(name='row_wise_max_pooling')
         self.ns = ns
         self.lg = lg
-        self.firstk = firstk
         
     def call(self, inputs):
         x = {}
         for i in range(1, self.lg+1):
-            x[i] = tf.math.top_k(inputs[:, :, self.firstk*(i-1):self.firstk*i], k=self.ns)[0]
+            x[i] = tf.math.top_k(inputs[:, :, :, i-1], k=self.ns)[0]
             
         return tf.keras.layers.concatenate([x[k] for k in x])
         
@@ -135,7 +138,7 @@ class Idf_concat(tf.keras.layers.Layer):
 class Recurrent_Layer(tf.keras.layers.Layer):
     def __init__(self, lq, ns, lg):
         super(Recurrent_Layer, self).__init__(name='Recurrent_Layer')
-        self.inputs_shape = (lq, ns*lg+1)
+        self.inputs_shape = (None, lq, ns*lg+1)
         self.lstm = tf.keras.layers.LSTM(units=1, input_shape=self.inputs_shape)
         
     def call(self, inputs):

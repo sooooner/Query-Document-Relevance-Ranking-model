@@ -3,9 +3,9 @@ from model.layers import Conv_stack, Dim_wise_max_pooling, Row_wise_max_pooling,
 import tensorflow as tf
 
 class PACRR(tf.keras.Model):
-    def __init__(self, firstk, lq, lg, nf, ns):
+    def __init__(self, lq, lg, nf, ns):
         super(PACRR, self).__init__(name='PACRR')
-        self.firstk = firstk
+        self._supports_ragged_inputs = True     
         self.lq = lq
         self.lg = lg
         self.nf = nf
@@ -13,7 +13,7 @@ class PACRR(tf.keras.Model):
         
         self.conv_stack = Conv_stack(lg=self.lg, nf=self.nf)
         self.dim_wise_max_pooling = Dim_wise_max_pooling(lg=self.lg, nf=self.nf)
-        self.row_wise_max_pooling = Row_wise_max_pooling(lg=self.lg, ns=self.ns, firstk=self.firstk)
+        self.row_wise_max_pooling = Row_wise_max_pooling(lg=self.lg, ns=self.ns)
         self.idf_concat = Idf_concat()
 
     def call(self, inputs, idf):
@@ -24,8 +24,10 @@ class PACRR(tf.keras.Model):
         return x
         
 class DRMM(tf.keras.Model):
-    def __init__(self):
+    def __init__(self, lq):
         super(DRMM, self).__init__(name='DRMM')
+        self._supports_ragged_inputs = True     
+        self.lq = lq
         initializer = tf.keras.initializers.he_normal()
         self.dense1 = tf.keras.layers.Dense(5, activation='relu', kernel_initializer=initializer)
         self.dense2 = tf.keras.layers.Dense(1, activation='relu', kernel_initializer=initializer)
@@ -34,22 +36,21 @@ class DRMM(tf.keras.Model):
     def call(self, inputs):
         x = self.dense1(inputs)
         x = self.dense2(x)
-        x = tf.squeeze(x)
+        x = tf.squeeze(x, axis=-1)
         x = self.dense3(x)
-        
         return x
         
 class PACRR_DRMM(tf.keras.Model):
-    def __init__(self, firstk, lq, lg, nf, ns):
+    def __init__(self, lq, lg, nf, ns):
         super(PACRR_DRMM, self).__init__(name='PACRR_DRMM')
-        self.firstk = firstk
+        self._supports_ragged_inputs = True     
         self.lq = lq
         self.lg = lg
         self.nf = nf
         self.ns = ns
         
-        self.pacrr = PACRR(firstk=self.firstk, lq=self.lq, lg=self.lg, nf=self.nf, ns=self.ns)
-        self.drmm = DRMM()
+        self.pacrr = PACRR(lq=self.lq, lg=self.lg, nf=self.nf, ns=self.ns)
+        self.drmm = DRMM(self.lq)
         
     def call(self, inputs, idf):
         x = self.pacrr(inputs, idf)
@@ -57,9 +58,9 @@ class PACRR_DRMM(tf.keras.Model):
         return x
         
 class Pairwise_PACRR_DRMM(tf.keras.Model):
-    def __init__(self, firstk, lq, lg, nf, ns):
+    def __init__(self, lq, lg, nf, ns):
         super(Pairwise_PACRR_DRMM, self).__init__(name='Pairwise_PACRR_DRMM')
-        self.Pacrr_Drmm = PACRR_DRMM(firstk, lq, lg, nf, ns)
+        self.Pacrr_Drmm = PACRR_DRMM(lq, lg, nf, ns)
         
     def call(self, inputs):
         positive_sim = inputs['positive_sim_matrix']
@@ -70,9 +71,30 @@ class Pairwise_PACRR_DRMM(tf.keras.Model):
         negative = self.Pacrr_Drmm(negative_sim, idf_softmax)
         
         return tf.concat([positive, negative], axis=0) 
-    
-    def predict(self, inputs):
-        sim_matrix = inputs['sim_matrix']
-        idf_softmax = inputs['idf_softmax']
-        rel = self.Pacrr_Drmm(sim_matrix, idf_softmax)
-        return rel
+
+        
+def Gen_PACRR_DRMM_Model(firstk, lq, lg, nf, ns, bert=False):
+    if not bert:
+        inputs = {'negative_sim_matrix': tf.keras.Input(shape=(lq, firstk), name='negative_sim_matrix'), 
+                  'positive_sim_matrix': tf.keras.Input(shape=(lq, firstk), name='positive_sim_matrix'),
+                  'idf_softmax'        : tf.keras.Input(shape=(lq), name='idf_softmax'),
+                  'query_idf'          : tf.keras.Input(shape=(None,), ragged=True, name='query_idf'),
+                  'positive_hist'      : tf.keras.Input(shape=(None, 30), ragged=True, name='positive_hist'),
+                  'negative_hist'      : tf.keras.Input(shape=(None, 30), ragged=True, name='negative_hist')}
+    else:
+        inputs = {'negative_sim_matrix': tf.keras.Input(shape=(4, lq, firstk), name='negative_sim_matrix'), 
+                  'positive_sim_matrix': tf.keras.Input(shape=(4, lq, firstk), name='positive_sim_matrix'),
+                  'idf_softmax'        : tf.keras.Input(shape=(lq), name='idf_softmax'),
+                  'query_idf'          : tf.keras.Input(shape=(None,), ragged=True, name='query_idf'),
+                  'positive_hist'      : tf.keras.Input(shape=(None, 30), ragged=True, name='positive_hist'),
+                  'negative_hist'      : tf.keras.Input(shape=(None, 30), ragged=True, name='negative_hist')}
+
+    output = Pairwise_PACRR_DRMM(lq, lg, nf, ns)(inputs)
+    model = tf.keras.Model(inputs=inputs, outputs=output)
+    return model
+        
+        
+        
+        
+        
+        
