@@ -1,0 +1,5 @@
+model_weights/
+data/
+.models/
+.ipynb_checkpoints/
+*.pyc
