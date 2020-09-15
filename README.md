@@ -1,1 +1,24 @@
-Query-Document-Relevence-Ranking-model
+# Query-Document-Relevence-Ranking-model
+
+Kaggle [Crowdflower Search Results Relevance data](https://www.kaggle.com/c/crowdflower-search-relevance)를 이용한 E-Commerce 사용자 검색 시스템 랭킹 모델
+
+## Description
+DRMM, PACRR, DRMM-PACRR 
+
+**Medium** 
++ [Query-Document Relevance Ranking model](https://medium.com/@tnsgh0101/query-document-relevence-ranking-model-596c8571b84)
++ [Query-Document Relevance Ranking model(2)](https://medium.com/@tnsgh0101/query-document-relevence-ranking-model-2-b50af71b2ca7)
+
+
+## utility
+모델에 사용된 함수
+
+## model
+keras model
+
+## Usage
+```
+python main.py --model=drmm --bert=True --lr=0.1 --batch=256 --epoch=100
+```
+
+## 참고자료 
