@@ -22,3 +22,20 @@ python main.py --model=drmm --bert=True --lr=0.1 --batch=256 --epoch=100
 ```
 
 ## 참고자료 
+[A Deep Relevance Matching Model for Ad-hoc Retrieval](https://arxiv.org/abs/1711.08611)
+[PACRR: A Position-Aware Neural IR Model for Relevance Matching](https://arxiv.org/abs/1704.03940)
+[Deep Relevance Ranking Using Enhanced Document-Query Interactions](https://arxiv.org/abs/1809.01682)
+[CEDR: Contextualized Embeddings for Document Ranking](https://arxiv.org/abs/1904.07094)
+
+
+
+
+
+
+
+
+
+
+
+
+
