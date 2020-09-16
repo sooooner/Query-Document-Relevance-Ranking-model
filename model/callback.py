@@ -1,24 +1,31 @@
 import tensorflow as tf
 from utility.utility import mAP_score, ndcg
+from model.loss import Pairwise_ranking_loss
 
 class LossHistory(tf.keras.callbacks.Callback):
+    def __init__(self, val):
+        self.val = val
+    
     def on_train_begin(self, logs={}):
         self.history = {'loss':[],'val_loss':[]}
-
+        pred = self.model.predict(self.val)
+        val_loss = Pairwise_ranking_loss(y_true=None, y_pred=pred)
+        self.history['val_loss'].append(val_loss)
+        
     def on_batch_end(self, batch, logs={}):
         self.history['loss'].append(logs.get('loss'))
         
     def on_epoch_end(self, epoch, logs={}):
         self.history['val_loss'].append(logs.get('val_loss'))
         
-        
 class _metric(tf.keras.callbacks.Callback):
     def __init__(self, test):
         self.test = test
         self.query = test['query'].unique()
         self.history = {'val_nDCG':[],'val_mAP':[]}
-
-    def on_epoch_end(self, epoch, logs={}):
+        
+        
+    def metric_calculator(self):
         ndcg_sum = 0
         mAP_sum = 0
         for q in self.query:
@@ -40,6 +47,15 @@ class _metric(tf.keras.callbacks.Callback):
             
         mAP = mAP_sum/len(self.query)
         ndcg_score = ndcg_sum/len(self.query)
+        return mAP, ndcg_score
+        
+    def on_train_begin(self, logs={}):
+        mAP, ndcg_score = self.metric_calculator()
+        self.history['val_nDCG'].append(ndcg_score)
+        self.history['val_mAP'].append(mAP)
+
+    def on_epoch_end(self, epoch, logs={}):
+        mAP, ndcg_score = self.metric_calculator()
         self.history['val_nDCG'].append(ndcg_score)
         self.history['val_mAP'].append(mAP)
         print(' - val_ndcg: %.4f - val_mAP: %.4f'%(ndcg_score, mAP))
