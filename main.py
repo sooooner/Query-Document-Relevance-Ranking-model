@@ -143,14 +143,7 @@ if __name__ == "__main__":
                          model_history,
                          model_metric])
     
-    history_plot(model_history, model_metric, batch_size, df=train, save=False)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    model_weight = model.get_weights()
+    with open('./model_weights/%s_%s_weight.pkl'%(args.model, args.bert), 'wb') as f:
+        pickle.dump(model_weight, f)
+    history_plot(model_history, model_metric, batch_size, df=train, save=True)
