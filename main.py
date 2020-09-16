@@ -29,17 +29,17 @@ def load_data(bert=False):
                                                                   "positive_sim_matrix": literal_eval,
                                                                   "idf_softmax"        : literal_eval})
 
-
         df = df[['query_preprocessed', 'positive_hist', 'negative_hist', 'query_idf', 'negative_sim_matrix', 'positive_sim_matrix', 'idf_softmax']]
         
         test = pd.read_csv('./data/paccr_drmm_all_test.csv', converters={"hist"       : literal_eval,
                                                                          "query_idf"  : literal_eval,
                                                                          "sim_matrix" : literal_eval,
                                                                          "idf_softmax": literal_eval})
-                                                                     
         test['binary_relevance'] = test['median_relevance'].apply(lambda x: 0 if x <= 2 else 1) 
+        
         dev_q = set(random.sample(list(df['query_preprocessed'].unique()), 40))
         train_q = set(df['query_preprocessed'].unique()) - dev_q
+        
         train = df[df['query_preprocessed'].isin(train_q)]
         dev = df[df['query_preprocessed'].isin(dev_q)]
         
@@ -67,7 +67,8 @@ def load_data(bert=False):
                                                                               "token_ids"          : literal_eval,
                                                                               "drmm_hist"          : literal_eval,
                                                                               'token'              : literal_eval})
-        
+                                                                              
+        test['binary_relevance'] = test['median_relevance'].apply(lambda x: 0 if x <= 2 else 1) 
         df = generate_pairwise_dataset(test)
         df.reset_index(inplace=True, drop=True)
         
@@ -76,6 +77,7 @@ def load_data(bert=False):
     
         train = df[df['query'].isin(train_q)]
         dev = df[df['query'].isin(dev_q)]
+        
         test = test[test['query'].isin(dev_q)]
         test.rename(columns={'drmm_hist':'hist'}, inplace=True)
     
