@@ -1,4 +1,5 @@
 #-*- coding:utf-8 -*-
+import math
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -76,11 +77,10 @@ def generate_pairwise_dataset(df):
     new_df.rename(columns={'query_idf_P':'query_idf', 'idf_softmax_P':'idf_softmax'}, inplace=True)
     return new_df
 
-def history_plot(model_history, model_metric, batch_size, df):
+def history_plot(model_history, model_metric, batch_size, df, save=False):
     fig, loss_ax = plt.subplots()
-
     acc_ax = loss_ax.twinx()
-    xx = np.linspace((len(df)//batch_size)+1, len(model_history.history['loss']), len(model_history.history['loss'])//((len(df)//batch_size)+1))
+    xx = [i*(math.ceil(len(df)/(batch_size))) for i in range(len(model_history.history['val_loss']))]
 
     loss_ax.plot(model_history.history['loss'], 'y', label='train loss')
     loss_ax.plot(xx, model_history.history['val_loss'], 'r', label='val loss')
@@ -94,6 +94,8 @@ def history_plot(model_history, model_metric, batch_size, df):
 
     loss_ax.legend(loc='upper left')
     acc_ax.legend(loc='lower left')
+    if save:
+        plt.savefig('fig1.png')
     plt.show()
 
 
