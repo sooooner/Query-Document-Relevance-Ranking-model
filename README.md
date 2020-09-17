@@ -23,8 +23,8 @@ Kaggle [Crowdflower Search Results Relevance data](https://www.kaggle.com/c/crow
 + DRMM, PACRR, PACRR_DRMM 모델들 비교 
 + CEDR 모델 비교
 
-**BERT_functional.ipynb**
-+ keras functional API를 통한 bert 모델링
+**BERT, BERT_functional.ipynb**
++ keras functional API를 통한 bert 모델링, 미세 조정
   
 
 ## data processing
@@ -43,7 +43,9 @@ utility/[README.md](https://github.com/sooooner/Query-Document-Relevance-Ranking
 model/[README.md](https://github.com/sooooner/Query-Document-Relevance-Ranking-model/blob/master/model/README.md) 참고
 
 ## Usage
-data processing.ipynb 와 data processing for bert.ipynb를 실행하여 preprocessed data를 생성한 뒤 main.py로 모델을 훈련 합니다. 
+1. BERT.ipynb로 미세조정을 합니다.
+2. data processing.ipynb 와 data processing for bert.ipynb를 실행하여 preprocessed data를 생성한 뒤 main.py로 모델을 훈련 합니다. 
+3. 아래 커맨드로 모델을 훈련시킵니다.
 
 ```
 python main.py --model=drmm --bert=True --lr=0.1 --batch=256 --epoch=100
