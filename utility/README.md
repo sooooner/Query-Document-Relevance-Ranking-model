@@ -15,7 +15,7 @@ python utility/processing.py --input=./data/train.csv --eda=True
 ```
 
 ## Easy Data Augmentation
-
+데이터 증강 
 + augment.py
 + eda.py
 
