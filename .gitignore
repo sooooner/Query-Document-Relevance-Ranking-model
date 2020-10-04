@@ -1,5 +1,6 @@
 model_weights/
 data/
+img/
 .models/
 .ipynb_checkpoints/
 *.pyc
@@ -7,3 +8,4 @@ data/
 *.txt
 *.model
 *.vocab
+*.png
