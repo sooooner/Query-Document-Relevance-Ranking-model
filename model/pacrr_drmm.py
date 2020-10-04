@@ -28,10 +28,11 @@ class DRMM(tf.keras.Model):
         super(DRMM, self).__init__(name='DRMM')
         self._supports_ragged_inputs = True     
         self.lq = lq
-        initializer = tf.keras.initializers.he_normal()
-        self.dense1 = tf.keras.layers.Dense(5, activation='relu', kernel_initializer=initializer)
-        self.dense2 = tf.keras.layers.Dense(1, activation='relu', kernel_initializer=initializer)
-        self.dense3 = tf.keras.layers.Dense(1, activation='relu', kernel_initializer=initializer)
+        # initializer = tf.keras.initializers.he_normal()
+        # initializer = tf.keras.initializers.GlorotNormal()
+        self.dense1 = tf.keras.layers.Dense(5, activation=tf.keras.activations.elu, kernel_initializer=tf.keras.initializers.he_normal())
+        self.dense2 = tf.keras.layers.Dense(1, activation=tf.keras.activations.elu, kernel_initializer=tf.keras.initializers.he_normal())
+        self.dense3 = tf.keras.layers.Dense(1, activation=tf.keras.activations.tanh, kernel_initializer=tf.keras.initializers.GlorotNormal())
 
     def call(self, inputs):
         x = self.dense1(inputs)
@@ -92,9 +93,3 @@ def Gen_PACRR_DRMM_Model(firstk, lq, lg, nf, ns, bert=False):
     output = Pairwise_PACRR_DRMM(lq, lg, nf, ns)(inputs)
     model = tf.keras.Model(inputs=inputs, outputs=output)
     return model
-        
-        
-        
-        
-        
-        

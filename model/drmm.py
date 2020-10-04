@@ -6,14 +6,14 @@ class DRMM(tf.keras.Model):
     def __init__(self):
         super(DRMM, self).__init__(name='DRMM')
         self._supports_ragged_inputs = True
-        self.Word_Matching_Network = Word_Matching_Network()
-        self.Gating_Network = Gating_Network()
-        self.Score_Aggregation = Score_Aggregation()
+        self.word_matching_network = Word_Matching_Network()
+        self.gating_network = Gating_Network()
+        self.score_aggregation = Score_Aggregation()
 
     def call(self, inputs, idf):
-        Z = self.Word_Matching_Network(inputs)
-        G = self.Gating_Network(idf)
-        score = self.Score_Aggregation(Z, G)
+        Z = self.word_matching_network(inputs)
+        G = self.gating_network(idf)
+        score = self.score_aggregation(Z, G)
         return score
         
 class Pairwise_DRMM(tf.keras.Model):
@@ -56,17 +56,3 @@ def Gen_DRMM_Model(bert=False):
     output = Pairwise_DRMM()(inputs)
     model = tf.keras.Model(inputs=inputs, outputs=output)
     return model
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        

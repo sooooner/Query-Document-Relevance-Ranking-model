@@ -2,14 +2,19 @@
 import tensorflow as tf
 
 class Dense(tf.keras.layers.Layer):
-    def __init__(self, units, input_dims=30, **kwargs):
+    def __init__(self, units, input_dims=30, activation='tanh', **kwargs):
         super(Dense, self).__init__(name='Linear', **kwargs)
         self._supports_ragged_inputs = True
         self.units = units
         self.input_dims = input_dims
+        self.activation = activation
 
     def build(self, input_shape):
-        initializer = tf.keras.initializers.he_normal()
+        if self.activation == 'tanh':
+            initializer = tf.keras.initializers.GlorotNormal()
+        else:
+            initializer = tf.keras.initializers.he_normal()
+        
         self.w = self.add_weight(
             shape=(self.input_dims, self.units),
             initializer=initializer,
@@ -17,29 +22,31 @@ class Dense(tf.keras.layers.Layer):
         
         self.b = self.add_weight(
             shape=(self.units,), 
-            initializer=tf.zeros_initializer, 
+            initializer=tf.zeros_initializer(), 
             trainable=True)
         
     def call(self, inputs):
         return tf.ragged.map_flat_values(tf.matmul, inputs, self.w) + self.b
-
+        
+        
 class Word_Matching_Network(tf.keras.Model):
     def __init__(self):
         super(Word_Matching_Network, self).__init__(name='Word_Matching_Network')
         self._supports_ragged_inputs = True        
-        self.Layer1 = Dense(5, input_dims=30)
-        self.Layer2 = Dense(5, input_dims=5)
-        self.Layer3 = Dense(1, input_dims=5)
+        self.Layer1 = Dense(5, input_dims=30, activation='tanh')
+        self.Layer2 = Dense(5, input_dims=5, activation='tanh')
+        self.Layer3 = Dense(1, input_dims=5, activation='tanh')
+        
 
     def call(self, inputs):
         x = self.Layer1(inputs)
-        x = tf.ragged.map_flat_values(tf.nn.relu, x)
+        x = tf.ragged.map_flat_values(tf.keras.activations.tanh, x)
         
         x = self.Layer2(x)
-        x = tf.ragged.map_flat_values(tf.nn.relu, x)
+        x = tf.ragged.map_flat_values(tf.keras.activations.tanh, x)
         
         x = self.Layer3(x)
-        x = tf.ragged.map_flat_values(tf.nn.relu, x)
+        x = tf.ragged.map_flat_values(tf.keras.activations.tanh, x)
         return x
 
 class Gating_Network(tf.keras.layers.Layer):
@@ -71,13 +78,14 @@ class Score_Aggregation(tf.keras.layers.Layer):
     def __init__(self):
         super(Score_Aggregation, self).__init__(name='Score_Aggregation')
         self._supports_ragged_inputs = True
-
+        
     def call(self, Z, g):
         score = tf.ragged.map_flat_values(tf.reshape, Z, shape=(-1, ))
         gating = g
         s_g_sum = tf.math.multiply(gating, score)
-        return tf.math.reduce_sum(s_g_sum, axis=1)
-
+        rel = tf.math.reduce_sum(s_g_sum, axis=1)
+        return rel
+        # return tf.keras.activations.tanh(rel)
 
 class Conv_stack(tf.keras.layers.Layer):
     def __init__(self, lg, nf):
@@ -143,10 +151,3 @@ class Recurrent_Layer(tf.keras.layers.Layer):
         
     def call(self, inputs):
         return self.lstm(inputs)
-        
-        
-        
-        
-        
-        
-        
