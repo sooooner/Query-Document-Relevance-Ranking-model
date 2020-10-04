@@ -61,22 +61,4 @@ def Gen_PACRR_Model(firstk, lq, lg, nf, ns, bert=False):
     output = Pairwise_PACRR(lq, lg, nf, ns)(inputs)
     model = tf.keras.Model(inputs=inputs, outputs=output)
     return model
-
-        
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-        
-        
