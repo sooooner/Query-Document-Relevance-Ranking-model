@@ -24,7 +24,6 @@ class _metric(tf.keras.callbacks.Callback):
         self.query = test['query'].unique()
         self.history = {'val_nDCG':[],'val_mAP':[]}
         
-        
     def metric_calculator(self):
         ndcg_sum = 0
         mAP_sum = 0
@@ -42,7 +41,7 @@ class _metric(tf.keras.callbacks.Callback):
             rel_pred = list(ndcg_test['median_relevance']-1)
             rel_true = ndcg_test['binary_relevance']
             
-            mAP_sum += mAP_score(rel_true)
+            mAP_sum += mAP_score(rel_true, p=20)
             ndcg_sum += ndcg(rel_pred, p=20, form="exp")
             
         mAP = mAP_sum/len(self.query)
