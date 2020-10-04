@@ -7,25 +7,27 @@ Kaggle [Crowdflower Search Results Relevance data](https://www.kaggle.com/c/crow
 
 **Description.ipynb**
 + DRMM, PACRR, DRMM_PACRR  요약 및 구현 설명
-+ [Query-Document Relevance Ranking model(DRMM)](https://medium.com/@tnsgh0101/query-document-relevence-ranking-model-596c8571b84)
-+ [Query-Document Relevance Ranking model(PACRR, PACRR-DRMM)](https://medium.com/@tnsgh0101/query-document-relevence-ranking-model-2-b50af71b2ca7)
++ [Query-Document Relevance Ranking model(DRMM)](https://medium.com/@tnsgh0101/query-document-relevence-ranking-model-596c8571b84)  
++ [Query-Document Relevance Ranking model(PACRR, PACRR-DRMM)](https://medium.com/@tnsgh0101/query-document-relevence-ranking-model-2-b50af71b2ca7)  
 
-**Description_bert.ipynb**
+**Description_CEDR.ipynb**
 + CEDR 요약 및 구현 설명
-+ [Query-Document Relevance Ranking model(CEDR)](https://medium.com/@tnsgh0101/query-document-relevance-ranking-model-3-9305028cf44)
++ [Query-Document Relevance Ranking model(CEDR)](https://medium.com/@tnsgh0101/query-document-relevance-ranking-model-3-9305028cf44)  
 
 ## model implement
 
 **DRMM, PACRR, PACRR_DRMM.ipynb**
 + 각 모델 구현 과정 
 
-**TOTAL, TOTAL-bert.ipynb**
+**TOTAL, TOTAL_CEDR.ipynb**
 + DRMM, PACRR, PACRR_DRMM 모델들 비교 
 + CEDR 모델 비교
 
-**BERT, BERT_functional.ipynb**
-+ keras functional API를 통한 bert 모델링, 미세 조정
-  
+**BERT_pretrain, BERT_fine_fune.ipynb**
++ keras functional API를 통한 bert 모델링  
+  + keras 모델링, 훈련은 하였지만 랭킹모델에서는 google pretrained 가중치를 다운받아 적용  
++ google pretrained bert model 미세 조정  
+  + 미세조정으로 [Crowdflower-Search-Results-Relevance](https://github.com/sooooner/Crowdflower-Search-Results-Relevance) kappa score 6.5 달성  
 
 ## data processing
 **data processing.ipynb**
