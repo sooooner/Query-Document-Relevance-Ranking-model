@@ -61,10 +61,8 @@ python main.py --model=drmm --bert=True --lr=0.1 --batch=256 --epoch=100
 [PACRR: A Position-Aware Neural IR Model for Relevance Matching](https://arxiv.org/abs/1704.03940)  
 [Deep Relevance Ranking Using Enhanced Document-Query Interactions](https://arxiv.org/abs/1809.01682)  
 [CEDR: Contextualized Embeddings for Document Ranking](https://arxiv.org/abs/1904.07094)  
-
-
-
-
+[BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1608.03983)  
+[SGDR: Stochastic Gradient Descent with Warm Restarts](https://arxiv.org/abs/1608.03983)  
 
 
 
