@@ -26,7 +26,9 @@ def ndcg(rel_pred, p=None, form="linear"):
     
     return dcg / idcg
 
-def mAP_score(rel_pred):
+def mAP_score(rel_pred, p=None):
+    if p:
+        rel_pred = rel_pred[:p]
     if sum(rel_pred) == 0:
         return 1
     count = 0
