@@ -14,6 +14,43 @@ Kaggle [Crowdflower Search Results Relevance data](https://www.kaggle.com/c/crow
 + CEDR 요약 및 구현 설명
 + [Query-Document Relevance Ranking model(CEDR)](https://medium.com/@tnsgh0101/query-document-relevance-ranking-model-3-9305028cf44)  
 
+## Project structure
+This project is organized as follows.
+
+```
+.
+└── model/
+    ├── README.md
+    ├── __init__.py
+    ├── callback.py                    # Custom callback function
+    ├── drmm.py                        # DRMM implement
+    ├── layers.py                      # custom layers for models implement
+    ├── loss.py                        # Pairwise ranking loss
+    ├── pacrr.py                       # PACRR implement
+    └── pacrr_drmm.py                  # PACRR_DRMM implement
+└── utility/           
+    └── README.md 
+    └── __init__.py
+    └── augment.py                     # data augmentation function
+    └── eda.py                         # EDA: Easy Data Augmentation Techniques for Boosting Performance on Text Classification Tasks
+    └── processing.py                  # preprocessing functions
+    └── utility.py                     # metrics, plot, data generate, etc. functions
+├── .gitignore                         
+├── BERT_fine_tune.ipynb               # BERT fine-tune implement
+├── BERT_pretrain.ipynb                # BERT pre-train implement
+├── DRMM.ipynb                         # A Deep Relevance Matching Model for Ad-hoc Retrieval implement
+├── Description.ipynb                  # description for this project
+├── Description_CEDR.ipynb             # description for CEDR: Contextualized Embeddings for Document Ranking
+├── PACRR.ipynb                        # PACRR: A Position-Aware Neural IR Model for Relevance Matching implement
+├── PACRR_DRMM.ipynb                   # Deep Relevance Ranking Using Enhanced Document-Query Interactions implement
+├── README.md
+├── TOTAL.ipynb                        # model training and evaluation
+├── TOTAL_CEDR.ipynb                   # CEDR model training and evaluation
+├── data processing for bert.ipynb     # data preprocessing for CEDR models
+├── data processing.ipynb              # data preprocessing for models      
+└── main.py                            # model training and save weight py
+```
+
 ## model implement
 
 **DRMM, PACRR, PACRR_DRMM.ipynb**
