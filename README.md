@@ -27,6 +27,7 @@ This project is organized as follows.
     ├── layers.py                      # custom layers for models implement
     ├── loss.py                        # Pairwise ranking loss
     ├── pacrr.py                       # PACRR implement
+    ├── train.py                       # model train
     └── pacrr_drmm.py                  # PACRR_DRMM implement
 └── utility/           
     └── README.md 
